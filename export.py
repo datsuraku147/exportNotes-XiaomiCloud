@@ -45,38 +45,42 @@ def alreadyAuthenticated():
     return webdriver.Chrome(service=chrome_service, options=options)
 
 
-
-# Gets the needed token to extract all of the user notes
-def getServiceToken():
+# Gets the needed cookies to extract all of the user notes
+def getCookies():
 
     driver = alreadyAuthenticated()
     driver.get("https://account.xiaomi.com/pass/serviceLogin?")
-
-
+    time.sleep(3)
     print(driver.current_url)
-    #time.sleep(3)
-    if "/service/account" in driver.current_url:
-        cookies = driver.get_cookies()
-    
-        with open("refresh.txt", "w") as cookie_file:
-            for cookie in cookies:
-                cookie_file.write(f"{cookie['name']}={cookie['value']};\n")
 
-        print("Cookies saved to refresh.txt")
+    if "/service/account" in driver.current_url:
+        print("[+]Authenticated already...")
+        
+        cookies = driver.get_cookies()
+        with open("cookie.txt", "w") as cookie_file:
+            for cookie in cookies:
+                if cookie["name"] == "userId":
+                    userId = f"userId={cookie['value']}"
+                    cookie_file.write(userId + "\n")
+
+        print("[+]userId saved to cookie.txt")
 
         driver.get("https://us.i.mi.com/note/h5")
         time.sleep(3)
         cookies = driver.get_cookies()
 
 
-        with open("cookie.txt", "w") as cookie_file:
+        with open("cookie.txt", "a") as cookie_file:
             for cookie in cookies:
-                cookie_file.write(f"{cookie['name']}={cookie['value']};")
+                if cookie["name"] == "serviceToken":
+                    serviceToken = f"serviceToken={cookie['value']}"
+                    cookie_file.write(serviceToken + "\n")
 
-        print("Cookies saved to cookie.txt")
+        print("[+]serviceToken saved to cookie.txt")
 
     elif "/login/password" in driver.current_url:
 
+        print("[/]Please Authenticate First.")
         driver.quit()
         driver = needToAuthenticate()
         driver.get("https://account.xiaomi.com/pass/serviceLogin?")
@@ -87,11 +91,13 @@ def getServiceToken():
         
         time.sleep(3)
         cookies = driver.get_cookies()
-        with open("refresh.txt", "w") as cookie_file:
+        with open("cookie.txt", "w") as cookie_file:
             for cookie in cookies:
-                cookie_file.write(f"{cookie['name']}={cookie['value']};\n")
+                if cookie["name"] == "userId":
+                    userId = f"userId={cookie['value']}"
+                    cookie_file.write(userId + "\n")
 
-        print("Cookies saved to refresh.txt")
+        print("[+]userId saved to cookie.txt")
 
         driver.get("https://us.i.mi.com/note/h5")
         time.sleep(3)
@@ -107,28 +113,30 @@ def getServiceToken():
             print("OTP completed")
 
             cookies = driver.get_cookies()
-            with open("cookie.txt", "w") as cookie_file:
+            with open("cookie.txt", "a") as cookie_file:
                 for cookie in cookies:
-                    cookie_file.write(f"{cookie['name']}={cookie['value']};")
+                    if cookie["name"] == "serviceToken":
+                        serviceToken = f"serviceToken={cookie['value']}"
+                        cookie_file.write(serviceToken + "\n")
 
-            print("Cookies saved to cookie.txt")
+            print("[+]serviceToken saved to cookie.txt")
 
         else:
             cookies = driver.get_cookies()
-            with open("cookie.txt", "w") as cookie_file:
+            with open("cookie.txt", "a") as cookie_file:
                 for cookie in cookies:
-                    cookie_file.write(f"{cookie['name']}={cookie['value']};")
+                    if cookie["name"] == "serviceToken":
+                        serviceToken = f"serviceToken={cookie['value']}"
+                        cookie_file.write(serviceToken + "\n")
 
-            print("Cookies saved to cookie.txt")
-
-
+            print("[+]serviceToken saved to cookie.txt")
 
     print("ADFSGJKNDFJGHKLJNGHLKERTMNGHLERMHLRTKGNSLDKDFNDKLFNGHLKGN")
     #time.sleep(5)
-    driver.quit()   
+    driver.quit()
 
 
 
 if __name__ == "__main__":
-    getServiceToken()
+    getCookies()
 
