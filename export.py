@@ -54,7 +54,7 @@ def getServiceToken():
 
 
     print(driver.current_url)
-    time.sleep(3)
+    #time.sleep(3)
     if "/service/account" in driver.current_url:
         cookies = driver.get_cookies()
     
@@ -105,6 +105,13 @@ def getServiceToken():
                 time.sleep(1) 
 
             print("OTP completed")
+
+            cookies = driver.get_cookies()
+            with open("cookie.txt", "w") as cookie_file:
+                for cookie in cookies:
+                    cookie_file.write(f"{cookie['name']}={cookie['value']};")
+
+            print("Cookies saved to cookie.txt")
 
         else:
             cookies = driver.get_cookies()
